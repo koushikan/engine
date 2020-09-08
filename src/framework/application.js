@@ -1548,8 +1548,8 @@ Object.assign(Application.prototype, {
 
         // In AUTO mode the resolution is the same as the canvas size, unless specified
         if (mode === RESOLUTION_AUTO && (width === undefined)) {
-            width = this.graphicsDevice.canvas.clientWidth;
-            height = this.graphicsDevice.canvas.clientHeight;
+            width = this.graphicsDevice.canvas.clientWidth || this.graphicsDevice.canvas.width;
+            height = this.graphicsDevice.canvas.clientHeight || this.graphicsDevice.canvas.height;
         }
 
         this.graphicsDevice.resizeCanvas(width, height);
