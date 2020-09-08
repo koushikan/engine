@@ -281,8 +281,28 @@ window.setupVertexArrayObject = function(gl) {
     // Ignore if already installed (or the browser provides the extension)
     // FIXME: when all stable browsers support getSupportedExtensions
     // and getExtension, remove the workarounds below.
+    var supportExtensions =  [
+      "OES_texture_float",
+      "OES_texture_float_linear",
+      "OES_texture_half_float",
+      "OES_texture_half_float_linear",
+      "OES_element_index_uint",
+      //"OES_standard_derivatives",
+      "EXT_shader_texture_lod",
+      "EXT_draw_buffers",
+      // "EXT_texture_filter_anisotropic",
+      "WEBGL_debug_renderer_info",
+      "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_etc1",
+      "WEBGL_compressed_texture_pvrtc",
+      //"WEBKIT_EXT_texture_filter_anisotropic",
+
+      //"WEBKIT_WEBGL_compressed_texture_s3tc",
+
+      "WEBKIT_WEBGL_compressed_texture_pvrtc"
+    ];
     if (gl.getSupportedExtensions) {
-        var exts = gl.getSupportedExtensions();
+        var exts = supportExtensions;
         if (exts.indexOf("OES_vertex_array_object") != -1) {
             return;
         }
@@ -296,7 +316,7 @@ window.setupVertexArrayObject = function(gl) {
     if (gl.getSupportedExtensions) {
         var original_getSupportedExtensions = gl.getSupportedExtensions;
         gl.getSupportedExtensions = function getSupportedExtensions() {
-            var list = original_getSupportedExtensions.call(this) || [];
+            var list = supportExtensions || [];
             list.push("OES_vertex_array_object");
             return list;
         };
