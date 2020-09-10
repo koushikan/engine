@@ -173,6 +173,12 @@ function getTouchTargetCoords(touch) {
     var totalOffsetX = 0;
     var totalOffsetY = 0;
     var target = touch.target;
+    if(!target){ 
+        return {
+           x: touch.pageX,
+           y: touch.pageY
+        };
+    }
     while (!(target instanceof HTMLElement)) {
         target = target.parentNode;
     }
