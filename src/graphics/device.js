@@ -1775,6 +1775,9 @@ Object.assign(GraphicsDevice.prototype, {
         return (typeof HTMLCanvasElement !== 'undefined' && texture instanceof HTMLCanvasElement) ||
                (typeof HTMLImageElement !== 'undefined' && texture instanceof HTMLImageElement) ||
                (typeof HTMLVideoElement !== 'undefined' && texture instanceof HTMLVideoElement) ||
+               (String.prototype.toString.call(texture) === "[object HTMLImageElement]") ||
+               (String.prototype.toString.call(texture) === "[object HTMLCanvasElement]") ||
+               (String.prototype.toString.call(texture) === "[object HTMLVideoElement]") ||
                (typeof ImageBitmap !== 'undefined' && texture instanceof ImageBitmap);
     },
 
