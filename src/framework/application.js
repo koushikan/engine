@@ -1618,8 +1618,9 @@ Object.assign(Application.prototype, {
             // FILLMODE_NONE use width and height that are provided
         }
 
-        this.graphicsDevice.canvas.style.width = width + 'px';
-        this.graphicsDevice.canvas.style.height = height + 'px';
+        /**wxminiprograme adapter**/
+        this.graphicsDevice.canvas.width = width;
+        this.graphicsDevice.canvas.height = height;
 
         // In AUTO mode the resolution is changed to match the canvas size
         if (this._resolutionMode === RESOLUTION_AUTO) {
