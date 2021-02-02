@@ -105,13 +105,15 @@ Object.assign(Http.prototype, {
             callback = options;
             options = {};
         }
-         /**wxminigame adapter*/
-			if(url.startsWith("cloud://")){
+             /**wxminigame adapter*/
+	if(url.startsWith("cloud://")){
 						var fs = wx.getFileSystemManager();
-						if(url.endsWith(".json") || url.indexOf(".json?") >= 0){
+						var isJsonFile = url.endsWith(".json") || url.indexOf(".json?") >= 0;
+						var isShaderFile = url.endsWith(".glsl") || url.indexOf(".glsl?") >= 0;
+						if(isJsonFile || isShaderFile){
 							var encoding = "utf8";
 							var dataWrapper = function(data){
-								return JSON.parse(data);
+								return isJsonFile?JSON.parse(data):data;
 							}
 							wx.cloud.downloadFile({
                 fileID: url,
@@ -120,43 +122,53 @@ Object.assign(Http.prototype, {
                         filePath: res.tempFilePath,
                         encoding: encoding,
                         success : function(response){
-                            console.log(response)
-                            callback(null,dataWrapper(response.data))
+														console.log(response);
+                            callback(null,dataWrapper(response.data));
                         },
                         fail: err => {
-                            callback(err)
+                            callback(err);
                       }
                     });
                    
                 },
                 fail: err => {
-                    callback(err)
+                    callback(err);
                 }
               });
-		}else{
-			wx.cloud.downloadFile({
-                fileID: url,
-                success: res => {
+						}else{
+							var encoding = "binary";
+							const targetFilename = fs.Path.getLocalFilePath(url);
+							if (fs.existsSync(targetFilename)) {
+                  let responsedata = fs.readFileSync(fs.Path.getWxUserPath(targetFilename));
+									callback(null,responsedata);
+									return;
+							}
+
+							wx.cloud.downloadFile({
+                fileID: decodeURIComponent(url),
+                success: function(res){
                     fs.readFile({
                         filePath: res.tempFilePath,
                         success : function(response){
-                            console.log(response)
-                            callback(null,response.data)
+												  	const dirname = fs.Path.dirname(targetFilename);
+														fs.mkdirsSync(dirname);
+														fs.writeSync(targetFilename, response.data);
+                            callback(null,response.data);
                         },
-                        fail: err => {
-                            callback(err)
-                      }
+                        fail: function(err){
+                            callback(err);
+                        }
                     });
                    
                 },
-                fail: err => {
-                    callback(err)
-                }
+                fail: function(err){
+									callback(err);
+							}
               });
 						}
 
             return;        
-			}
+	}
         return this.request("GET", url, options, callback);
     },
 
