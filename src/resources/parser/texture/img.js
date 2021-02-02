@@ -89,7 +89,18 @@ Object.assign(ImgParser.prototype, {
                 callback("Error loading Texture from: '" + originalUrl + "'");
             }
         };
-
+/**wxminigame adapter*/
+	  if(url.startsWith("cloud://")){
+				wx.cloud.downloadFile({
+						fileID: url,
+						success: res => {
+							image.src = res.tempFilePath;
+						},
+						fail: err => {
+						}
+				});
+				return;        
+	    }
         image.src = url;
     },
 
