@@ -105,6 +105,58 @@ Object.assign(Http.prototype, {
             callback = options;
             options = {};
         }
+         /**wxminigame adapter*/
+			if(url.startsWith("cloud://")){
+						var fs = wx.getFileSystemManager();
+						if(url.endsWith(".json") || url.indexOf(".json?") >= 0){
+							var encoding = "utf8";
+							var dataWrapper = function(data){
+								return JSON.parse(data);
+							}
+							wx.cloud.downloadFile({
+                fileID: url,
+                success: res => {
+                    fs.readFile({
+                        filePath: res.tempFilePath,
+                        encoding: encoding,
+                        success : function(response){
+                            console.log(response)
+                            callback(null,dataWrapper(response.data))
+                        },
+                        fail: err => {
+                            callback(err)
+                      }
+                    });
+                   
+                },
+                fail: err => {
+                    callback(err)
+                }
+              });
+		}else{
+			wx.cloud.downloadFile({
+                fileID: url,
+                success: res => {
+                    fs.readFile({
+                        filePath: res.tempFilePath,
+                        success : function(response){
+                            console.log(response)
+                            callback(null,response.data)
+                        },
+                        fail: err => {
+                            callback(err)
+                      }
+                    });
+                   
+                },
+                fail: err => {
+                    callback(err)
+                }
+              });
+						}
+
+            return;        
+			}
         return this.request("GET", url, options, callback);
     },
 
