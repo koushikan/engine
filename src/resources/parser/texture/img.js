@@ -90,13 +90,40 @@ Object.assign(ImgParser.prototype, {
             }
         };
 /**wxminigame adapter*/
-	  if(url.startsWith("cloud://")){
+	if(url.startsWith("cloud://")){
+				var fs = wx.getFileSystemManager();
+				const targetFilename = fs.Path.getLocalFilePath(url);
+				if (fs.existsSync(targetFilename)) {
+						image.src = fs.Path.getWxUserPath(targetFilename);
+						return;
+				}
+
+        const dirname = fs.Path.dirname(targetFilename);
+				fs.mkdirsSync(dirname);
+				const file_target = fs.Path.getWxUserPath(targetFilename);
+
 				wx.cloud.downloadFile({
-						fileID: url,
-						success: res => {
-							image.src = res.tempFilePath;
+						fileID: decodeURIComponent(url),
+						success:  function(res) {
+
+							if (res.statusCode >= 400) {
+								try {
+									fs.accessSync(file_target);
+									fs.unlinkSync(file_target);
+								} catch (e) {
+
+								}
+								callback("Error loading Texture from: '" + originalUrl + "'");
+						  } else {
+
+								var savedFilePath = fs.saveFileSync(res.tempFilePath,file_target);
+								console.log(savedFilePath)
+								fs.setFsCache(targetFilename, 1);
+								img.src = savedFilePath;
+						  }		
 						},
 						fail: err => {
+							callback("Error loading Texture from: '" + originalUrl + "'");
 						}
 				});
 				return;        
